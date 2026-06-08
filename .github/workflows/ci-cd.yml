@@ -8,8 +8,8 @@ on:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_BACKEND: ${{ github.repository }}/notes-backend
-  IMAGE_FRONTEND: ${{ github.repository }}/notes-frontend
+  IMAGE_BACKEND: alphadev2023/notes-etudiants/notes-backend
+  IMAGE_FRONTEND: alphadev2023/notes-etudiants/notes-frontend
 
 jobs:
   # ─── Tests Backend ───────────────────────────────────────
@@ -93,11 +93,11 @@ jobs:
 
       - name: Install dependencies
         working-directory: ./frontend
-        run: npm ci
+        run: npm install --legacy-peer-deps
 
       - name: Build Angular
         working-directory: ./frontend
-        run: npm run build:prod
+        run: npm run build -- --configuration production
 
       - name: Login to GitHub Container Registry
         uses: docker/login-action@v3
