@@ -1,0 +1,93 @@
+<div class="space-y-6">
+  <!-- Bienvenue -->
+  <div class="card bg-gradient-to-r from-warning-500 to-warning-600 border-0 text-white">
+    <div class="flex items-center gap-4">
+      <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+        <app-icon name="graduation-cap" [size]="24" class="text-white"></app-icon>
+      </div>
+      <div>
+        <h2 class="text-xl font-bold">Bienvenue, {{ getUserName() }}</h2>
+        <p class="text-warning-100 text-sm">Espace étudiant</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="grid grid-cols-3 gap-4">
+    <div class="card text-center">
+      <p class="text-3xl font-bold text-primary-600">{{ notes().length }}</p>
+      <p class="text-xs text-neutral-500 mt-1">Notes</p>
+    </div>
+    <div class="card text-center">
+      <p class="text-3xl font-bold text-warning-600">{{ getMoyenne() }}</p>
+      <p class="text-xs text-neutral-500 mt-1">Moyenne</p>
+    </div>
+    <div class="card text-center">
+      <p
+        class="text-3xl font-bold"
+        [class.text-success-600]="getStatut() === 'Admis'"
+        [class.text-danger-600]="getStatut() === 'Ajourné'"
+      >
+        {{ getStatut() }}
+      </p>
+      <p class="text-xs text-neutral-500 mt-1">Statut</p>
+    </div>
+  </div>
+
+  <!-- Dernières notes -->
+  <div class="card" *ngIf="notes().length > 0">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-base font-semibold text-neutral-800">Dernières notes</h3>
+      <a routerLink="/etudiant/notes" class="text-xs text-primary-600 hover:underline">Voir tout</a>
+    </div>
+    <div class="space-y-2">
+      <div
+        *ngFor="let note of notes().slice(0, 5)"
+        class="flex items-center justify-between p-3 rounded-lg bg-neutral-50"
+      >
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 bg-primary-100 rounded-lg flex items-center justify-center">
+            <app-icon name="clipboard-list" [size]="14" class="text-primary-600"></app-icon>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-neutral-700">{{ note.typeNote }}</p>
+            <p class="text-xs text-neutral-400">Matière #{{ note.matiereId }}</p>
+          </div>
+        </div>
+        <span
+          class="text-lg font-bold"
+          [class.text-success-600]="note.valeur >= 10"
+          [class.text-danger-600]="note.valeur < 10"
+        >
+          {{ note.valeur }}/20
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Accès rapides -->
+  <div class="card">
+    <h3 class="text-base font-semibold text-neutral-800 mb-4">Actions rapides</h3>
+    <div class="grid grid-cols-2 gap-3">
+      <a
+        *ngFor="let link of quickLinks"
+        [routerLink]="link.route"
+        class="flex items-center gap-3 p-3 rounded-lg border border-neutral-200 hover:bg-warning-50 hover:border-warning-200 transition-all group"
+      >
+        <div
+          class="w-8 h-8 bg-neutral-100 group-hover:bg-warning-100 rounded-lg flex items-center justify-center transition-colors"
+        >
+          <app-icon
+            [name]="link.icon"
+            [size]="16"
+            class="text-neutral-600 group-hover:text-warning-600"
+          ></app-icon>
+        </div>
+        <span class="text-sm font-medium text-neutral-700 group-hover:text-warning-700">{{
+          link.label
+        }}</span>
+        <app-icon name="chevron-right" [size]="16" class="text-neutral-400 ml-auto"></app-icon>
+      </a>
+    </div>
+  </div>
+</div>

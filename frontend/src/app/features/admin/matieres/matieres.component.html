@@ -1,0 +1,137 @@
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <div>
+      <h2 class="text-xl font-bold text-neutral-800">Gestion des matières</h2>
+      <p class="text-sm text-neutral-500">Catalogue des matières par classe</p>
+    </div>
+    <button (click)="toggleForm()" class="btn-primary flex items-center gap-2">
+      <app-icon [name]="showForm() ? 'x' : 'plus'" [size]="16"></app-icon>
+      {{ showForm() ? 'Annuler' : 'Nouvelle matière' }}
+    </button>
+  </div>
+
+  <div
+    *ngIf="successMsg()"
+    class="p-3 bg-success-50 border border-success-200 rounded-lg flex items-center gap-2"
+  >
+    <app-icon name="check-circle" [size]="16" class="text-success-600"></app-icon>
+    <p class="text-success-700 text-sm">{{ successMsg() }}</p>
+  </div>
+
+  <!-- Formulaire -->
+  <div *ngIf="showForm()" class="card border-primary-200 bg-primary-50/30">
+    <h3 class="text-base font-semibold text-neutral-800 mb-4">Nouvelle matière</h3>
+
+    <div
+      *ngIf="errorMsg()"
+      class="mb-3 p-3 bg-danger-50 border border-danger-200 rounded-lg flex items-center gap-2"
+    >
+      <app-icon name="alert-triangle" [size]="16" class="text-danger-600"></app-icon>
+      <p class="text-danger-700 text-sm">{{ errorMsg() }}</p>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label class="label">Nom de la matière</label>
+        <input type="text" [(ngModel)]="form.nom" class="input" placeholder="Ex: Algorithmique" />
+      </div>
+      <div>
+        <label class="label">Code</label>
+        <input type="text" [(ngModel)]="form.code" class="input" placeholder="Ex: ALGO3" />
+      </div>
+      <div>
+        <label class="label">Coefficient</label>
+        <input
+          type="number"
+          [(ngModel)]="form.coefficient"
+          min="0.5"
+          max="10"
+          step="0.5"
+          class="input"
+        />
+      </div>
+      <div>
+        <label class="label">Semestre</label>
+        <select [(ngModel)]="form.semestre" class="input">
+          <option [value]="1">Semestre 1</option>
+          <option [value]="2">Semestre 2</option>
+        </select>
+      </div>
+      <div class="col-span-2">
+        <label class="label">Classe</label>
+        <select [(ngModel)]="form.classeId" class="input">
+          <option [value]="0">Sélectionner une classe</option>
+          <option *ngFor="let c of classes()" [value]="c.id">{{ c.nom }}</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="flex justify-end mt-4">
+      <button (click)="onSubmit()" [disabled]="saving()" class="btn-primary">
+        <app-icon *ngIf="saving()" name="refresh" [size]="16" class="animate-spin mr-2"></app-icon>
+        {{ saving() ? 'Enregistrement...' : 'Créer la matière' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Filtre par classe -->
+  <div class="card">
+    <label class="label">Filtrer par classe</label>
+    <select
+      [(ngModel)]="selectedClasseId"
+      (ngModelChange)="onClasseChange()"
+      class="input max-w-xs"
+    >
+      <option [value]="0">Toutes les classes</option>
+      <option *ngFor="let c of classes()" [value]="c.id">{{ c.nom }}</option>
+    </select>
+  </div>
+
+  <!-- Loader -->
+  <div *ngIf="loading()" class="flex items-center justify-center py-12">
+    <app-icon name="refresh" [size]="32" class="text-primary-400 animate-spin"></app-icon>
+  </div>
+
+  <!-- Table -->
+  <div *ngIf="!loading() && matieres().length > 0" class="table-container">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Matière</th>
+          <th>Code</th>
+          <th>Coefficient</th>
+          <th>Semestre</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let matiere of matieres()">
+          <td class="font-medium text-neutral-800">{{ matiere.nom }}</td>
+          <td>
+            <span class="badge badge-primary">{{ matiere.code }}</span>
+          </td>
+          <td class="text-neutral-600">{{ matiere.coefficient }}</td>
+          <td>
+            <span class="badge badge-warning">Sem. {{ matiere.semestre }}</span>
+          </td>
+          <td>
+            <button
+              (click)="delete(matiere.id)"
+              class="p-2 text-danger-500 hover:bg-danger-50 rounded-lg transition-colors"
+            >
+              <app-icon name="trash" [size]="16"></app-icon>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div
+    *ngIf="!loading() && matieres().length === 0 && selectedClasseId"
+    class="card text-center py-8"
+  >
+    <app-icon name="book-open" [size]="32" class="text-neutral-300 mx-auto mb-2"></app-icon>
+    <p class="text-neutral-500 text-sm">Aucune matière pour cette classe</p>
+  </div>
+</div>

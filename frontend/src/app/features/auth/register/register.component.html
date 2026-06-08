@@ -1,0 +1,120 @@
+<div
+  class="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center p-4"
+>
+  <div class="w-full max-w-md">
+    <!-- Logo -->
+    <div class="text-center mb-8">
+      <div
+        class="w-16 h-16 bg-primary-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg"
+      >
+        <app-icon name="user" [size]="32" class="text-white"></app-icon>
+      </div>
+      <h1 class="text-2xl font-bold text-neutral-800">Créer un compte</h1>
+      <p class="text-neutral-500 mt-1 text-sm">Rejoignez la plateforme</p>
+    </div>
+
+    <div class="card shadow-lg">
+      <!-- Success -->
+      <div
+        *ngIf="success()"
+        class="mb-4 p-3 bg-success-50 border border-success-200 rounded-lg flex items-center gap-2"
+      >
+        <app-icon name="check-circle" [size]="16" class="text-success-600"></app-icon>
+        <p class="text-success-700 text-sm">{{ success() }}</p>
+      </div>
+
+      <!-- Error -->
+      <div
+        *ngIf="error()"
+        class="mb-4 p-3 bg-danger-50 border border-danger-200 rounded-lg flex items-center gap-2"
+      >
+        <app-icon name="alert-triangle" [size]="16" class="text-danger-600"></app-icon>
+        <p class="text-danger-700 text-sm">{{ error() }}</p>
+      </div>
+
+      <div class="space-y-4">
+        <!-- Nom / Prénom -->
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="label">Nom</label>
+            <input type="text" [(ngModel)]="nom" placeholder="Dupont" class="input" />
+          </div>
+          <div>
+            <label class="label">Prénom</label>
+            <input type="text" [(ngModel)]="prenom" placeholder="Jean" class="input" />
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div>
+          <label class="label">Email</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <app-icon name="mail" [size]="16" class="text-neutral-400"></app-icon>
+            </div>
+            <input
+              type="email"
+              [(ngModel)]="email"
+              placeholder="jean.dupont@email.com"
+              class="input pl-9"
+            />
+          </div>
+        </div>
+
+        <!-- Rôle -->
+        <div>
+          <label class="label">Rôle</label>
+          <select [(ngModel)]="role" class="input">
+            <option *ngFor="let r of roles" [value]="r.value">{{ r.label }}</option>
+          </select>
+        </div>
+
+        <!-- Password -->
+        <div>
+          <label class="label">Mot de passe</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <app-icon name="lock" [size]="16" class="text-neutral-400"></app-icon>
+            </div>
+            <input
+              [type]="showPassword() ? 'text' : 'password'"
+              [(ngModel)]="password"
+              placeholder="Minimum 8 caractères"
+              class="input pl-9 pr-9"
+            />
+            <button
+              type="button"
+              (click)="togglePassword()"
+              class="absolute inset-y-0 right-0 pr-3 flex items-center"
+            >
+              <app-icon
+                [name]="showPassword() ? 'eye-off' : 'eye'"
+                [size]="16"
+                class="text-neutral-400"
+              ></app-icon>
+            </button>
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <button (click)="onSubmit()" [disabled]="loading()" class="btn-primary w-full mt-2">
+          <app-icon
+            *ngIf="loading()"
+            name="refresh"
+            [size]="16"
+            class="animate-spin mr-2"
+          ></app-icon>
+          {{ loading() ? 'Création...' : 'Créer mon compte' }}
+        </button>
+
+        <!-- Login link -->
+        <p class="text-center text-sm text-neutral-500">
+          Déjà un compte ?
+          <a routerLink="/auth/login" class="text-primary-600 hover:underline font-medium"
+            >Se connecter</a
+          >
+        </p>
+      </div>
+    </div>
+  </div>
+</div>

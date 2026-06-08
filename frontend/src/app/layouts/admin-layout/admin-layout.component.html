@@ -1,0 +1,95 @@
+<div class="flex h-screen bg-neutral-50 overflow-hidden">
+  <!-- Sidebar -->
+  <aside
+    class="flex flex-col bg-white border-r border-neutral-200 transition-all duration-300"
+    [class.w-64]="sidebarOpen()"
+    [class.w-16]="!sidebarOpen()"
+  >
+    <!-- Logo -->
+    <div class="flex items-center gap-3 px-4 py-5 border-b border-neutral-100">
+      <div class="w-8 h-8 bg-primary-600 rounded-lg flex items-center justify-center flex-shrink-0">
+        <app-icon name="graduation-cap" [size]="18" class="text-white"></app-icon>
+      </div>
+      <span
+        class="font-bold text-neutral-800 text-sm whitespace-nowrap overflow-hidden transition-all"
+        [class.opacity-0]="!sidebarOpen()"
+        [class.w-0]="!sidebarOpen()"
+      >
+        Notes Admin
+      </span>
+    </div>
+
+    <!-- Nav -->
+    <nav class="flex-1 p-3 space-y-1">
+      <a
+        *ngFor="let item of navItems"
+        [routerLink]="item.route"
+        routerLinkActive="active"
+        class="sidebar-link"
+      >
+        <app-icon [name]="item.icon" [size]="20"></app-icon>
+        <span
+          class="whitespace-nowrap overflow-hidden transition-all"
+          [class.opacity-0]="!sidebarOpen()"
+          [class.w-0]="!sidebarOpen()"
+        >
+          {{ item.label }}
+        </span>
+      </a>
+    </nav>
+
+    <!-- User + Logout -->
+    <div class="p-3 border-t border-neutral-100">
+      <div class="flex items-center gap-3 px-3 py-2 rounded-lg bg-neutral-50">
+        <div
+          class="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center flex-shrink-0"
+        >
+          <app-icon name="user" [size]="16" class="text-primary-600"></app-icon>
+        </div>
+        <div
+          class="overflow-hidden transition-all"
+          [class.opacity-0]="!sidebarOpen()"
+          [class.w-0]="!sidebarOpen()"
+        >
+          <p class="text-xs font-medium text-neutral-800 truncate">{{ getUserName() }}</p>
+          <p class="text-xs text-neutral-400">Administrateur</p>
+        </div>
+      </div>
+      <button
+        (click)="logout()"
+        class="sidebar-link w-full mt-1 text-danger-600 hover:bg-danger-50 hover:text-danger-700"
+      >
+        <app-icon name="log-out" [size]="20"></app-icon>
+        <span
+          class="whitespace-nowrap overflow-hidden transition-all"
+          [class.opacity-0]="!sidebarOpen()"
+          [class.w-0]="!sidebarOpen()"
+        >
+          Déconnexion
+        </span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <div class="flex-1 flex flex-col overflow-hidden">
+    <!-- Header -->
+    <header class="bg-white border-b border-neutral-200 px-6 py-4 flex items-center gap-4">
+      <button
+        (click)="toggleSidebar()"
+        class="p-2 rounded-lg hover:bg-neutral-100 transition-colors"
+      >
+        <app-icon name="menu" [size]="20" class="text-neutral-600"></app-icon>
+      </button>
+      <h1 class="text-lg font-semibold text-neutral-800 flex-1">Gestion des Notes</h1>
+      <div class="flex items-center gap-2">
+        <span class="badge badge-primary">Admin</span>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <main class="flex-1 overflow-y-auto p-6">
+      <router-outlet />
+    </main>
+  </div>
+</div>

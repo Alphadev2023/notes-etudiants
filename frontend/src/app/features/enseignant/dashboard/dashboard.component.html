@@ -1,0 +1,88 @@
+<div class="space-y-6">
+  <!-- Bienvenue -->
+  <div class="card bg-gradient-to-r from-success-600 to-success-700 border-0 text-white">
+    <div class="flex items-center gap-4">
+      <div class="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
+        <app-icon name="book-open" [size]="24" class="text-white"></app-icon>
+      </div>
+      <div>
+        <h2 class="text-xl font-bold">Bienvenue, {{ getUserName() }}</h2>
+        <p class="text-success-100 text-sm">Espace enseignant</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="grid grid-cols-2 gap-4">
+    <div class="card">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-lg bg-success-50 flex items-center justify-center">
+          <app-icon name="users" [size]="20" class="text-success-600"></app-icon>
+        </div>
+        <div>
+          <p class="text-2xl font-bold text-neutral-800">{{ classes().length }}</p>
+          <p class="text-xs text-neutral-500">Classes assignées</p>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-lg bg-primary-50 flex items-center justify-center">
+          <app-icon name="graduation-cap" [size]="20" class="text-primary-600"></app-icon>
+        </div>
+        <div>
+          <p class="text-2xl font-bold text-neutral-800">{{ getTotalEtudiants() }}</p>
+          <p class="text-xs text-neutral-500">Étudiants total</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Classes -->
+  <div class="card" *ngIf="classes().length > 0">
+    <h3 class="text-base font-semibold text-neutral-800 mb-4">Mes classes</h3>
+    <div class="space-y-2">
+      <div
+        *ngFor="let classe of classes()"
+        class="flex items-center justify-between p-3 rounded-lg bg-neutral-50 border border-neutral-200"
+      >
+        <div class="flex items-center gap-3">
+          <div class="w-8 h-8 bg-success-100 rounded-lg flex items-center justify-center">
+            <app-icon name="graduation-cap" [size]="16" class="text-success-600"></app-icon>
+          </div>
+          <div>
+            <p class="text-sm font-medium text-neutral-800">{{ classe.nom }}</p>
+            <p class="text-xs text-neutral-500">{{ classe.niveau }} — {{ classe.annee }}</p>
+          </div>
+        </div>
+        <span class="badge badge-success">{{ classe.etudiantIds.length }} étudiants</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Accès rapides -->
+  <div class="card">
+    <h3 class="text-base font-semibold text-neutral-800 mb-4">Actions rapides</h3>
+    <div class="grid grid-cols-2 gap-3">
+      <a
+        *ngFor="let link of quickLinks"
+        [routerLink]="link.route"
+        class="flex items-center gap-3 p-3 rounded-lg border border-neutral-200 hover:bg-success-50 hover:border-success-200 transition-all group"
+      >
+        <div
+          class="w-8 h-8 bg-neutral-100 group-hover:bg-success-100 rounded-lg flex items-center justify-center transition-colors"
+        >
+          <app-icon
+            [name]="link.icon"
+            [size]="16"
+            class="text-neutral-600 group-hover:text-success-600"
+          ></app-icon>
+        </div>
+        <span class="text-sm font-medium text-neutral-700 group-hover:text-success-700">{{
+          link.label
+        }}</span>
+        <app-icon name="chevron-right" [size]="16" class="text-neutral-400 ml-auto"></app-icon>
+      </a>
+    </div>
+  </div>
+</div>

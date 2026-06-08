@@ -1,0 +1,99 @@
+<div
+  class="min-h-screen bg-gradient-to-br from-primary-50 to-primary-100 flex items-center justify-center p-4"
+>
+  <div class="w-full max-w-md">
+    <!-- Logo -->
+    <div class="text-center mb-8">
+      <div
+        class="w-16 h-16 bg-primary-600 rounded-2xl flex items-center justify-center mx-auto mb-4 shadow-lg"
+      >
+        <app-icon name="graduation-cap" [size]="32" class="text-white"></app-icon>
+      </div>
+      <h1 class="text-2xl font-bold text-neutral-800">Gestion des Notes</h1>
+      <p class="text-neutral-500 mt-1 text-sm">Connectez-vous à votre espace</p>
+    </div>
+
+    <!-- Card -->
+    <div class="card shadow-lg">
+      <!-- Error -->
+      <div
+        *ngIf="error()"
+        class="mb-4 p-3 bg-danger-50 border border-danger-200 rounded-lg flex items-center gap-2"
+      >
+        <app-icon
+          name="alert-triangle"
+          [size]="16"
+          class="text-danger-600 flex-shrink-0"
+        ></app-icon>
+        <p class="text-danger-700 text-sm">{{ error() }}</p>
+      </div>
+
+      <!-- Form -->
+      <div class="space-y-4">
+        <!-- Email -->
+        <div>
+          <label class="label">Adresse email</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <app-icon name="mail" [size]="16" class="text-neutral-400"></app-icon>
+            </div>
+            <input
+              type="email"
+              [(ngModel)]="email"
+              placeholder="exemple@email.com"
+              class="input pl-9"
+              [class.input-error]="error()"
+            />
+          </div>
+        </div>
+
+        <!-- Password -->
+        <div>
+          <label class="label">Mot de passe</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <app-icon name="lock" [size]="16" class="text-neutral-400"></app-icon>
+            </div>
+            <input
+              [type]="showPassword() ? 'text' : 'password'"
+              [(ngModel)]="password"
+              placeholder="••••••••"
+              class="input pl-9 pr-9"
+              [class.input-error]="error()"
+            />
+            <button
+              type="button"
+              (click)="togglePassword()"
+              class="absolute inset-y-0 right-0 pr-3 flex items-center"
+            >
+              <app-icon
+                [name]="showPassword() ? 'eye-off' : 'eye'"
+                [size]="16"
+                class="text-neutral-400"
+              ></app-icon>
+            </button>
+          </div>
+        </div>
+
+        <!-- Submit -->
+        <button (click)="onSubmit()" [disabled]="loading()" class="btn-primary w-full mt-2">
+          <app-icon
+            *ngIf="loading()"
+            name="refresh"
+            [size]="16"
+            class="animate-spin mr-2"
+          ></app-icon>
+          {{ loading() ? 'Connexion...' : 'Se connecter' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- Comptes de test -->
+    <div class="mt-4 card bg-neutral-50 border-neutral-200 text-xs text-neutral-500 space-y-1">
+      <p class="font-medium text-neutral-600 mb-2">Comptes de test :</p>
+      <p>Admin : admin&#64;notes.com / Admin1234!</p>
+      <p>Enseignant : enseignant&#64;notes.com / Enseignant1234!</p>
+      <p>Étudiant : etudiant&#64;notes.com / Etudiant1234!</p>
+    </div>
+  </div>
+</div>

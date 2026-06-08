@@ -1,0 +1,53 @@
+<div class="space-y-6">
+  <div>
+    <h2 class="text-xl font-bold text-neutral-800">Statistiques</h2>
+    <p class="text-sm text-neutral-500">Vue d'ensemble de l'établissement</p>
+  </div>
+
+  <!-- Cartes globales -->
+  <div class="grid grid-cols-3 gap-4">
+    <div class="card text-center">
+      <div class="w-10 h-10 bg-primary-50 rounded-lg flex items-center justify-center mx-auto mb-2">
+        <app-icon name="graduation-cap" [size]="20" class="text-primary-600"></app-icon>
+      </div>
+      <p class="text-3xl font-bold text-neutral-800">{{ classes().length }}</p>
+      <p class="text-xs text-neutral-500 mt-1">Classes</p>
+    </div>
+    <div class="card text-center">
+      <div class="w-10 h-10 bg-success-50 rounded-lg flex items-center justify-center mx-auto mb-2">
+        <app-icon name="users" [size]="20" class="text-success-600"></app-icon>
+      </div>
+      <p class="text-3xl font-bold text-neutral-800">{{ getTotalEtudiants() }}</p>
+      <p class="text-xs text-neutral-500 mt-1">Étudiants</p>
+    </div>
+    <div class="card text-center">
+      <div class="w-10 h-10 bg-warning-50 rounded-lg flex items-center justify-center mx-auto mb-2">
+        <app-icon name="book-open" [size]="20" class="text-warning-600"></app-icon>
+      </div>
+      <p class="text-3xl font-bold text-neutral-800">{{ matieres().length }}</p>
+      <p class="text-xs text-neutral-500 mt-1">Matières</p>
+    </div>
+  </div>
+
+  <!-- Graphique par classe -->
+  <div class="card">
+    <div class="flex items-center justify-between mb-4">
+      <h3 class="text-base font-semibold text-neutral-800">Coefficients par matière</h3>
+      <select
+        [(ngModel)]="selectedClasseId"
+        (ngModelChange)="onClasseChange()"
+        class="input max-w-xs"
+      >
+        <option [value]="0">Sélectionner une classe</option>
+        <option *ngFor="let c of classes()" [value]="c.id">{{ c.nom }}</option>
+      </select>
+    </div>
+
+    <div *ngIf="!selectedClasseId" class="text-center py-12">
+      <app-icon name="bar-chart" [size]="48" class="text-neutral-300 mx-auto mb-3"></app-icon>
+      <p class="text-neutral-500 text-sm">Sélectionnez une classe pour afficher le graphique</p>
+    </div>
+
+    <canvas *ngIf="selectedClasseId" #chartCanvas></canvas>
+  </div>
+</div>

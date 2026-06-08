@@ -1,0 +1,109 @@
+<div class="space-y-6">
+  <div>
+    <h2 class="text-xl font-bold text-neutral-800">Mes relevés de notes</h2>
+    <p class="text-sm text-neutral-500">Générez et téléchargez vos relevés officiels</p>
+  </div>
+
+  <!-- Alertes -->
+  <div
+    *ngIf="successMsg()"
+    class="p-3 bg-success-50 border border-success-200 rounded-lg flex items-center gap-2"
+  >
+    <app-icon name="check-circle" [size]="16" class="text-success-600"></app-icon>
+    <p class="text-success-700 text-sm">{{ successMsg() }}</p>
+  </div>
+  <div
+    *ngIf="errorMsg()"
+    class="p-3 bg-danger-50 border border-danger-200 rounded-lg flex items-center gap-2"
+  >
+    <app-icon name="alert-triangle" [size]="16" class="text-danger-600"></app-icon>
+    <p class="text-danger-700 text-sm">{{ errorMsg() }}</p>
+  </div>
+
+  <!-- Générer un relevé -->
+  <div class="card border-warning-200 bg-warning-50/30">
+    <h3 class="text-base font-semibold text-neutral-800 mb-4 flex items-center gap-2">
+      <app-icon name="file-text" [size]="18" class="text-warning-600"></app-icon>
+      Générer un nouveau relevé
+    </h3>
+    <div class="grid grid-cols-3 gap-4">
+      <div>
+        <label class="label">Classe</label>
+        <select [(ngModel)]="selectedClasseId" class="input">
+          <option [value]="0">Sélectionner une classe</option>
+          <option *ngFor="let c of classes()" [value]="c.id">{{ c.nom }}</option>
+        </select>
+      </div>
+      <div>
+        <label class="label">Semestre</label>
+        <select [(ngModel)]="selectedSemestre" class="input">
+          <option [value]="1">Semestre 1</option>
+          <option [value]="2">Semestre 2</option>
+        </select>
+      </div>
+      <div>
+        <label class="label">Année académique</label>
+        <input type="text" [(ngModel)]="annee" class="input" placeholder="2024-2025" />
+      </div>
+    </div>
+    <div class="flex justify-end mt-4">
+      <button
+        (click)="generer()"
+        [disabled]="generating() || !selectedClasseId"
+        class="btn-warning flex items-center gap-2"
+      >
+        <app-icon *ngIf="generating()" name="refresh" [size]="16" class="animate-spin"></app-icon>
+        <app-icon *ngIf="!generating()" name="file-text" [size]="16"></app-icon>
+        {{ generating() ? 'Génération...' : 'Générer le relevé' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Liste relevés -->
+  <div *ngIf="loading()" class="flex items-center justify-center py-12">
+    <app-icon name="refresh" [size]="32" class="text-warning-400 animate-spin"></app-icon>
+  </div>
+
+  <div *ngIf="!loading() && releves().length === 0" class="card text-center py-12">
+    <app-icon name="file-text" [size]="48" class="text-neutral-300 mx-auto mb-3"></app-icon>
+    <p class="text-neutral-500">Aucun relevé généré pour le moment</p>
+    <p class="text-neutral-400 text-sm mt-1">
+      Utilisez le formulaire ci-dessus pour générer votre premier relevé
+    </p>
+  </div>
+
+  <div *ngIf="!loading() && releves().length > 0" class="grid gap-4">
+    <div *ngFor="let releve of releves()" class="card">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 bg-warning-50 rounded-xl flex items-center justify-center">
+            <app-icon name="file-text" [size]="24" class="text-warning-600"></app-icon>
+          </div>
+          <div>
+            <p class="font-semibold text-neutral-800">Relevé — Semestre {{ releve.semestre }}</p>
+            <p class="text-sm text-neutral-500">Année {{ releve.annee }}</p>
+            <div class="flex items-center gap-2 mt-1">
+              <span [class]="getStatutClass(releve.statut)">{{ releve.statut }}</span>
+              <span class="text-sm text-neutral-600 font-medium">
+                Moyenne : {{ releve.moyenneGen }}/20
+              </span>
+            </div>
+          </div>
+        </div>
+        <button
+          (click)="downloadPdf(releve.id)"
+          [disabled]="downloading() === releve.id"
+          class="btn-primary flex items-center gap-2"
+        >
+          <app-icon
+            [name]="downloading() === releve.id ? 'refresh' : 'download'"
+            [size]="16"
+            [class.animate-spin]="downloading() === releve.id"
+          >
+          </app-icon>
+          {{ downloading() === releve.id ? 'Téléchargement...' : 'Télécharger PDF' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

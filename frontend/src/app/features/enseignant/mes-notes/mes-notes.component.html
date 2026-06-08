@@ -1,0 +1,70 @@
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <div>
+      <h2 class="text-xl font-bold text-neutral-800">Notes saisies</h2>
+      <p class="text-sm text-neutral-500">Toutes les notes que vous avez enregistrées</p>
+    </div>
+    <div class="flex gap-3">
+      <div class="card py-2 px-4 text-center">
+        <p class="text-xl font-bold text-success-600">{{ notes().length }}</p>
+        <p class="text-xs text-neutral-500">Notes</p>
+      </div>
+      <div class="card py-2 px-4 text-center">
+        <p class="text-xl font-bold text-primary-600">{{ getTotalEtudiants() }}</p>
+        <p class="text-xs text-neutral-500">Étudiants</p>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="loading()" class="flex items-center justify-center py-12">
+    <app-icon name="refresh" [size]="32" class="text-success-400 animate-spin"></app-icon>
+  </div>
+
+  <div *ngIf="!loading() && notes().length === 0" class="card text-center py-12">
+    <app-icon name="clipboard-list" [size]="48" class="text-neutral-300 mx-auto mb-3"></app-icon>
+    <p class="text-neutral-500">Aucune note saisie pour le moment</p>
+  </div>
+
+  <div *ngIf="!loading() && notes().length > 0" class="table-container">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Matière</th>
+          <th>Étudiant</th>
+          <th>Type</th>
+          <th>Note</th>
+          <th>Statut</th>
+          <th>Commentaire</th>
+          <th>Date</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let note of notes()">
+          <td class="font-medium text-neutral-800">{{ getMatiereName(note.matiereId) }}</td>
+          <td class="text-neutral-500">Étudiant #{{ note.etudiantId }}</td>
+          <td>
+            <span class="badge badge-primary">{{ note.typeNote }}</span>
+          </td>
+          <td>
+            <span
+              class="text-lg font-bold"
+              [class.text-success-600]="note.valeur >= 10"
+              [class.text-danger-600]="note.valeur < 10"
+            >
+              {{ note.valeur }}/20
+            </span>
+          </td>
+          <td>
+            <span [class]="getBadgeClass(note.valeur)">
+              {{ note.valeur >= 10 ? 'Admis' : 'Ajourné' }}
+            </span>
+          </td>
+          <td class="text-neutral-400 text-sm">{{ note.commentaire || '—' }}</td>
+          <td class="text-neutral-400 text-sm">
+            {{ note.createdAt | date: 'dd/MM/yyyy' }}
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

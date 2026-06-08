@@ -1,0 +1,45 @@
+<div class="relative">
+  <button
+    (click)="toggleOpen()"
+    class="relative p-2 rounded-lg hover:bg-neutral-100 transition-colors"
+  >
+    <app-icon name="bell" [size]="20" class="text-neutral-600"></app-icon>
+    <span
+      *ngIf="notificationService.unreadCount() > 0"
+      class="absolute top-1 right-1 w-4 h-4 bg-danger-500 text-white text-xs rounded-full flex items-center justify-center font-bold"
+    >
+      {{ notificationService.unreadCount() }}
+    </span>
+  </button>
+
+  <div
+    *ngIf="open()"
+    class="absolute right-0 top-10 w-72 bg-white border border-neutral-200 rounded-xl shadow-lg z-50 overflow-hidden"
+  >
+    <div class="px-4 py-3 border-b border-neutral-100 flex items-center justify-between">
+      <p class="text-sm font-semibold text-neutral-800">Notifications</p>
+      <button
+        (click)="notificationService.clear()"
+        class="text-xs text-neutral-400 hover:text-danger-500"
+      >
+        Tout effacer
+      </button>
+    </div>
+
+    <div class="max-h-64 overflow-y-auto">
+      <div *ngIf="notificationService.notifications().length === 0" class="text-center py-8">
+        <app-icon name="bell" [size]="24" class="text-neutral-300 mx-auto mb-2"></app-icon>
+        <p class="text-xs text-neutral-400">Aucune notification</p>
+      </div>
+
+      <div
+        *ngFor="let notif of notificationService.notifications()"
+        class="px-4 py-3 border-b border-neutral-50 hover:bg-neutral-50 transition-colors"
+        [class.bg-primary-50]="!notif.read"
+      >
+        <p class="text-sm font-medium text-neutral-800">{{ notif.message }}</p>
+        <p class="text-xs text-neutral-400 mt-0.5">{{ notif.type }}</p>
+      </div>
+    </div>
+  </div>
+</div>

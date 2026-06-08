@@ -1,0 +1,55 @@
+<div class="min-h-screen bg-gradient-to-br from-primary-600 to-primary-800 flex flex-col">
+  <!-- Header -->
+  <header class="px-8 py-6 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 bg-white/20 rounded-xl flex items-center justify-center">
+        <app-icon name="graduation-cap" [size]="24" class="text-white"></app-icon>
+      </div>
+      <span class="text-white font-bold text-lg">NotesManager</span>
+    </div>
+    <a routerLink="/auth/login" class="btn bg-white text-primary-700 hover:bg-primary-50">
+      Se connecter
+    </a>
+  </header>
+
+  <!-- Hero -->
+  <main class="flex-1 flex items-center justify-center px-8 py-16">
+    <div class="text-center max-w-3xl">
+      <div class="w-24 h-24 bg-white/10 rounded-3xl flex items-center justify-center mx-auto mb-8">
+        <app-icon name="award" [size]="48" class="text-white"></app-icon>
+      </div>
+      <h1 class="text-5xl font-bold text-white mb-6 leading-tight">
+        Système de Gestion<br />des Notes Étudiantes
+      </h1>
+      <p class="text-primary-200 text-xl mb-10">
+        Plateforme complète pour la saisie, le suivi et l'export des notes académiques.
+      </p>
+
+      <!-- Features -->
+      <div class="grid grid-cols-3 gap-4 mb-10">
+        <div class="bg-white/10 rounded-xl p-4 text-left">
+          <app-icon name="clipboard-list" [size]="24" class="text-primary-200 mb-2"></app-icon>
+          <h3 class="text-white font-semibold text-sm">Saisie des notes</h3>
+          <p class="text-primary-300 text-xs mt-1">Par enseignant, par matière et par classe</p>
+        </div>
+        <div class="bg-white/10 rounded-xl p-4 text-left">
+          <app-icon name="bar-chart" [size]="24" class="text-primary-200 mb-2"></app-icon>
+          <h3 class="text-white font-semibold text-sm">Statistiques</h3>
+          <p class="text-primary-300 text-xs mt-1">Moyennes, coefficients et classements</p>
+        </div>
+        <div class="bg-white/10 rounded-xl p-4 text-left">
+          <app-icon name="file-text" [size]="24" class="text-primary-200 mb-2"></app-icon>
+          <h3 class="text-white font-semibold text-sm">Relevés PDF</h3>
+          <p class="text-primary-300 text-xs mt-1">Export PDF et Excel automatisés</p>
+        </div>
+      </div>
+
+      <a
+        routerLink="/auth/login"
+        class="btn bg-white text-primary-700 hover:bg-primary-50 text-base px-8 py-3"
+      >
+        Accéder à la plateforme
+      </a>
+    </div>
+  </main>
+</div>

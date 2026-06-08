@@ -1,0 +1,92 @@
+<div class="space-y-6 max-w-2xl">
+  <div>
+    <h2 class="text-xl font-bold text-neutral-800">Saisie des notes</h2>
+    <p class="text-sm text-neutral-500">Enregistrez les notes de vos étudiants</p>
+  </div>
+
+  <div *ngIf="loading()" class="flex items-center justify-center py-12">
+    <app-icon name="refresh" [size]="32" class="text-success-400 animate-spin"></app-icon>
+  </div>
+
+  <div *ngIf="!loading()" class="card space-y-4">
+    <!-- Success -->
+    <div
+      *ngIf="successMsg()"
+      class="p-3 bg-success-50 border border-success-200 rounded-lg flex items-center gap-2"
+    >
+      <app-icon name="check-circle" [size]="16" class="text-success-600"></app-icon>
+      <p class="text-success-700 text-sm">{{ successMsg() }}</p>
+    </div>
+
+    <!-- Error -->
+    <div
+      *ngIf="errorMsg()"
+      class="p-3 bg-danger-50 border border-danger-200 rounded-lg flex items-center gap-2"
+    >
+      <app-icon name="alert-triangle" [size]="16" class="text-danger-600"></app-icon>
+      <p class="text-danger-700 text-sm">{{ errorMsg() }}</p>
+    </div>
+
+    <!-- Classe -->
+    <div>
+      <label class="label">Classe</label>
+      <select [(ngModel)]="selectedClasseId" (ngModelChange)="onClasseChange()" class="input">
+        <option [value]="0">Sélectionner une classe</option>
+        <option *ngFor="let classe of classes()" [value]="classe.id">
+          {{ classe.nom }} — {{ classe.niveau }}
+        </option>
+      </select>
+    </div>
+
+    <!-- Matière -->
+    <div>
+      <label class="label">Matière</label>
+      <select [(ngModel)]="selectedMatiereId" class="input" [disabled]="!selectedClasseId">
+        <option [value]="0">Sélectionner une matière</option>
+        <option *ngFor="let matiere of matieres()" [value]="matiere.id">
+          {{ matiere.nom }} (Coeff. {{ matiere.coefficient }})
+        </option>
+      </select>
+    </div>
+
+    <!-- Étudiant -->
+    <div>
+      <label class="label">Étudiant</label>
+      <select [(ngModel)]="selectedEtudiantId" class="input" [disabled]="!selectedClasseId">
+        <option [value]="0">Sélectionner un étudiant</option>
+        <option *ngFor="let id of getEtudiants()" [value]="id">Étudiant #{{ id }}</option>
+      </select>
+    </div>
+
+    <!-- Type et valeur -->
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label class="label">Type de note</label>
+        <select [(ngModel)]="typeNote" class="input">
+          <option *ngFor="let type of typesNote" [value]="type">{{ type }}</option>
+        </select>
+      </div>
+      <div>
+        <label class="label">Note (0—20)</label>
+        <input type="number" [(ngModel)]="valeur" min="0" max="20" step="0.5" class="input" />
+      </div>
+    </div>
+
+    <!-- Commentaire -->
+    <div>
+      <label class="label">Commentaire (optionnel)</label>
+      <textarea
+        [(ngModel)]="commentaire"
+        rows="3"
+        class="input resize-none"
+        placeholder="Observations sur la note..."
+      ></textarea>
+    </div>
+
+    <!-- Submit -->
+    <button (click)="onSubmit()" [disabled]="saving()" class="btn-primary w-full">
+      <app-icon *ngIf="saving()" name="refresh" [size]="16" class="animate-spin mr-2"></app-icon>
+      {{ saving() ? 'Enregistrement...' : 'Enregistrer la note' }}
+    </button>
+  </div>
+</div>
