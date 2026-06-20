@@ -54,6 +54,18 @@ services:
     networks:
       - notes-network
 
+  frontend-react:
+    build:
+      context: ./frontend-react
+      dockerfile: Dockerfile
+    container_name: notes-frontend-react
+    ports:
+      - "81:80"
+    depends_on:
+      - backend
+    networks:
+      - notes-network
+
 volumes:
   postgres_data:
 

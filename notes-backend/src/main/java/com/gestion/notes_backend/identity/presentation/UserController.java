@@ -28,4 +28,10 @@ public class UserController {
     public ResponseEntity<List<UserDto>> findAll() {
         return ResponseEntity.ok(userService.findAll());
     }
+
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_ENSEIGNANT')")
+    public ResponseEntity<UserDto> findById(@PathVariable Long id) {
+        return ResponseEntity.ok(userService.findById(id));
+    }
 }

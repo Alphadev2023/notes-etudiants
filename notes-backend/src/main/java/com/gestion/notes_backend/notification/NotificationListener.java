@@ -2,6 +2,7 @@ package com.gestion.notes_backend.notification;
 
 import com.gestion.notes_backend.identity.domain.User;
 import com.gestion.notes_backend.identity.domain.UserRepository;
+import com.gestion.notes_backend.identity.infrastructure.JpaUserRepository;
 import com.gestion.notes_backend.matieres.domain.Matiere;
 import com.gestion.notes_backend.matieres.domain.MatiereRepository;
 import com.gestion.notes_backend.notes.domain.NoteCreatedEvent;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.modulith.events.ApplicationModuleListener;
 import org.springframework.stereotype.Component;
+
 
 @Component
 @RequiredArgsConstructor
@@ -23,11 +25,8 @@ public class NotificationListener {
     @ApplicationModuleListener
     public void onNoteCreated(NoteCreatedEvent event) {
         try {
-            User etudiant = userRepository.findByEmail(
-                    userRepository.findByEmail("etudiant@notes.com")
-                            .map(User::getEmail)
-                            .orElseThrow(() -> new ResourceNotFoundException("Étudiant introuvable"))
-            ).orElseThrow(() -> new ResourceNotFoundException("Étudiant introuvable"));
+            User etudiant = ((JpaUserRepository) userRepository).findById(event.etudiantId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Étudiant introuvable"));
 
             Matiere matiere = matiereRepository.findById(event.matiereId())
                     .orElseThrow(() -> new ResourceNotFoundException("Matière introuvable"));

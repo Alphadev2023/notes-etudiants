@@ -27,4 +27,10 @@ public class UserService {
                 .map(UserDto::from)
                 .toList();
     }
+
+    public UserDto findById(Long id) {
+        return ((JpaUserRepository) userRepository).findById(id)
+                .map(UserDto::from)
+                .orElseThrow(() -> new BusinessException("Utilisateur introuvable"));
+    }
 }
