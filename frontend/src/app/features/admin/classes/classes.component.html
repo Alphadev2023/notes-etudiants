@@ -93,7 +93,7 @@
             <span class="badge badge-success">{{ classe.etudiantIds.length }} étudiants</span>
             <span class="badge badge-warning">{{ classe.enseignantIds.length }} enseignants</span>
             <button
-              (click)="$event.stopPropagation(); delete(classe.id)"
+              (click)="$event.stopPropagation(); ouvrirConfirmDelete(classe.id)"
               class="p-1.5 text-danger-500 hover:bg-danger-50 rounded-lg transition-colors"
             >
               <app-icon name="trash" [size]="14"></app-icon>
@@ -193,4 +193,13 @@
       </ng-container>
     </div>
   </div>
+  <app-confirm-modal
+    [open]="confirmModalOpen()"
+    title="Supprimer cette classe ?"
+    message="Cette action est irréversible. Toutes les affectations liées seront perdues."
+    confirmLabel="Supprimer"
+    [loading]="deleting()"
+    (confirm)="confirmerDelete()"
+    (cancel)="fermerConfirmDelete()"
+  ></app-confirm-modal>
 </div>

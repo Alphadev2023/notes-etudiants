@@ -25,7 +25,7 @@ public class NotificationListener {
     @ApplicationModuleListener
     public void onNoteCreated(NoteCreatedEvent event) {
         try {
-            User etudiant = ((JpaUserRepository) userRepository).findById(event.etudiantId())
+            User etudiant = userRepository.findUserById(event.etudiantId())
                     .orElseThrow(() -> new ResourceNotFoundException("Étudiant introuvable"));
 
             Matiere matiere = matiereRepository.findById(event.matiereId())

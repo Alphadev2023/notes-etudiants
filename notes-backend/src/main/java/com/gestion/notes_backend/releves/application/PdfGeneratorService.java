@@ -30,10 +30,8 @@ public class PdfGeneratorService {
     private final NoteRepository noteRepository;
 
     public byte[] generateReleve(Releve releve) throws IOException {
-        User etudiant = userRepository.findByEmail(
-                userRepository.findByEmail("etudiant@notes.com")
-                        .map(User::getEmail).orElse("")
-        ).orElseThrow(() -> new ResourceNotFoundException("Étudiant introuvable"));
+        User etudiant = userRepository.findUserById(releve.getEtudiantId())
+                .orElseThrow(() -> new ResourceNotFoundException("Étudiant introuvable"));
 
         List<Matiere> matieres = matiereRepository.findByClasseId(releve.getClasseId());
 

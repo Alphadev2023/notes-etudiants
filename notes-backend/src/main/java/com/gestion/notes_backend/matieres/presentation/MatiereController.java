@@ -30,6 +30,11 @@ public class MatiereController {
         return ResponseEntity.ok(matiereService.findByClasse(classeId));
     }
 
+    @GetMapping
+    public ResponseEntity<List<MatiereResponse>> findAll() {
+        return ResponseEntity.ok(matiereService.findAll());
+    }
+
     @GetMapping("/classe/{classeId}/semestre/{semestre}")
     public ResponseEntity<List<MatiereResponse>> findByClasseAndSemestre(
             @PathVariable Long classeId,

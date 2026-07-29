@@ -10,6 +10,10 @@ export class MatiereService {
 
   constructor(private http: HttpClient) {}
 
+  findAll(): Observable<Matiere[]> {
+    return this.http.get<Matiere[]>(this.url);
+  }
+
   create(request: MatiereRequest): Observable<Matiere> {
     return this.http.post<Matiere>(this.url, request);
   }

@@ -2,7 +2,7 @@
   <div class="flex items-center justify-between">
     <div>
       <h2 class="text-xl font-bold text-neutral-800">Notes saisies</h2>
-      <p class="text-sm text-neutral-500">Toutes les notes que vous avez enregistrées</p>
+      <p class="text-sm text-neutral-500">Toutes les notes que vous avez enregistrees</p>
     </div>
     <div class="flex gap-3">
       <div class="card py-2 px-4 text-center">
@@ -11,7 +11,7 @@
       </div>
       <div class="card py-2 px-4 text-center">
         <p class="text-xl font-bold text-primary-600">{{ getTotalEtudiants() }}</p>
-        <p class="text-xs text-neutral-500">Étudiants</p>
+        <p class="text-xs text-neutral-500">Etudiants</p>
       </div>
     </div>
   </div>
@@ -25,12 +25,24 @@
     <p class="text-neutral-500">Aucune note saisie pour le moment</p>
   </div>
 
+  <div *ngIf="!loading() && notes().length > 0" class="flex items-center justify-end gap-2">
+    <span class="text-sm text-neutral-500">Afficher</span>
+    <select
+      [(ngModel)]="pageSize"
+      (ngModelChange)="onPageSizeChange()"
+      class="input w-20 py-1.5"
+    >
+      <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
+    </select>
+    <span class="text-sm text-neutral-500">par page</span>
+  </div>
+
   <div *ngIf="!loading() && notes().length > 0" class="table-container">
     <table class="table">
       <thead>
         <tr>
-          <th>Matière</th>
-          <th>Étudiant</th>
+          <th>Matiere</th>
+          <th>Etudiant</th>
           <th>Type</th>
           <th>Note</th>
           <th>Statut</th>
@@ -39,9 +51,9 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let note of notes()">
+        <tr *ngFor="let note of notesPage()">
           <td class="font-medium text-neutral-800">{{ getMatiereName(note.matiereId) }}</td>
-          <td class="text-neutral-500">Étudiant #{{ note.etudiantId }}</td>
+          <td class="text-neutral-500">{{ getNomEtudiant(note.etudiantId) }}</td>
           <td>
             <span class="badge badge-primary">{{ note.typeNote }}</span>
           </td>
@@ -56,15 +68,52 @@
           </td>
           <td>
             <span [class]="getBadgeClass(note.valeur)">
-              {{ note.valeur >= 10 ? 'Admis' : 'Ajourné' }}
+              {{ note.valeur >= 10 ? 'Admis' : 'Ajourne' }}
             </span>
           </td>
-          <td class="text-neutral-400 text-sm">{{ note.commentaire || '—' }}</td>
+          <td class="text-neutral-400 text-sm">{{ note.commentaire || '-' }}</td>
           <td class="text-neutral-400 text-sm">
             {{ note.createdAt | date: 'dd/MM/yyyy' }}
           </td>
         </tr>
       </tbody>
     </table>
+
+    <div *ngIf="totalPages() > 1" class="flex items-center justify-between mt-4 px-1">
+      <p class="text-sm text-neutral-500">
+        Page {{ currentPage() }} sur {{ totalPages() }} - {{ notes().length }} note(s)
+      </p>
+      <div class="flex items-center gap-2">
+        <button
+          [disabled]="currentPage() === 1"
+          (click)="allerPage(currentPage() - 1)"
+          class="px-3 py-1.5 text-sm rounded-lg border border-neutral-300 hover:bg-neutral-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        >
+          Precedent
+        </button>
+        <div class="flex gap-1">
+          <button
+            *ngFor="let p of pagesArray()"
+            (click)="allerPage(p)"
+            class="w-8 h-8 text-sm rounded-lg transition-colors font-medium"
+            [class.bg-primary-600]="p === currentPage()"
+            [class.text-white]="p === currentPage()"
+            [class.border]="p !== currentPage()"
+            [class.border-neutral-300]="p !== currentPage()"
+            [class.hover:bg-neutral-50]="p !== currentPage()"
+            [class.text-neutral-600]="p !== currentPage()"
+          >
+            {{ p }}
+          </button>
+        </div>
+        <button
+          [disabled]="currentPage() === totalPages()"
+          (click)="allerPage(currentPage() + 1)"
+          class="px-3 py-1.5 text-sm rounded-lg border border-neutral-300 hover:bg-neutral-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        >
+          Suivant
+        </button>
+      </div>
+    </div>
   </div>
 </div>

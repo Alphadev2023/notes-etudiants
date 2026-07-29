@@ -34,6 +34,15 @@
     <p class="text-neutral-500">Aucune note disponible pour le moment</p>
   </div>
 
+  <!-- Sélecteur taille de page -->
+  <div *ngIf="!loading() && notes().length > 0" class="flex items-center justify-end gap-2">
+    <span class="text-sm text-neutral-500">Afficher</span>
+    <select [(ngModel)]="pageSize" (ngModelChange)="onPageSizeChange()" class="input w-20 py-1.5">
+      <option *ngFor="let size of pageSizeOptions" [value]="size">{{ size }}</option>
+    </select>
+    <span class="text-sm text-neutral-500">par page</span>
+  </div>
+
   <!-- Notes table -->
   <div *ngIf="!loading() && notes().length > 0" class="table-container">
     <table class="table">
@@ -48,7 +57,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let note of notes()">
+        <tr *ngFor="let note of notesPage()">
           <td class="font-medium text-neutral-800">{{ getMatiereName(note.matiereId) }}</td>
           <td>
             <span class="badge badge-primary">{{ note.typeNote }}</span>
@@ -74,5 +83,43 @@
         </tr>
       </tbody>
     </table>
+
+    <!-- Pagination -->
+    <div *ngIf="totalPages() > 1" class="flex items-center justify-between mt-4 px-1">
+      <p class="text-sm text-neutral-500">
+        Page {{ currentPage() }} sur {{ totalPages() }} — {{ notes().length }} note(s)
+      </p>
+      <div class="flex items-center gap-2">
+        <button
+          [disabled]="currentPage() === 1"
+          (click)="allerPage(currentPage() - 1)"
+          class="px-3 py-1.5 text-sm rounded-lg border border-neutral-300 hover:bg-neutral-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        >
+          Précédent
+        </button>
+        <div class="flex gap-1">
+          <button
+            *ngFor="let p of pagesArray()"
+            (click)="allerPage(p)"
+            class="w-8 h-8 text-sm rounded-lg transition-colors font-medium"
+            [class.bg-primary-600]="p === currentPage()"
+            [class.text-white]="p === currentPage()"
+            [class.border]="p !== currentPage()"
+            [class.border-neutral-300]="p !== currentPage()"
+            [class.hover:bg-neutral-50]="p !== currentPage()"
+            [class.text-neutral-600]="p !== currentPage()"
+          >
+            {{ p }}
+          </button>
+        </div>
+        <button
+          [disabled]="currentPage() === totalPages()"
+          (click)="allerPage(currentPage() + 1)"
+          class="px-3 py-1.5 text-sm rounded-lg border border-neutral-300 hover:bg-neutral-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+        >
+          Suivant
+        </button>
+      </div>
+    </div>
   </div>
 </div>

@@ -1,10 +1,14 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { forkJoin } from 'rxjs';
 import { IconComponent } from '../../../shared/components/icon/icon.component';
 import { ClasseService } from '../../../core/services/classe.service';
 import { MatiereService } from '../../../core/services/matiere.service';
 import { AuthService } from '../../../core/auth/auth.service';
+import { environment } from '../../../../environments/environment';
+import { User } from '../../../core/models/user.model';
 
 @Component({
   selector: 'app-dashboard',
@@ -16,7 +20,6 @@ export class DashboardComponent implements OnInit {
   totalClasses = signal(0);
   totalEtudiants = signal(0);
   loading = signal(true);
-
   stats = signal([
     {
       label: 'Classes',
@@ -57,17 +60,25 @@ export class DashboardComponent implements OnInit {
 
   constructor(
     private classeService: ClasseService,
+    private matiereService: MatiereService,
+    private http: HttpClient,
     public authService: AuthService,
   ) {}
 
   ngOnInit() {
-    this.classeService.findAll().subscribe({
-      next: (classes) => {
+    forkJoin({
+      classes: this.classeService.findAll(),
+      matieres: this.matiereService.findAll(),
+      users: this.http.get<User[]>(`${environment.apiUrl}/users`),
+    }).subscribe({
+      next: ({ classes, matieres, users }) => {
         const totalEtudiants = classes.reduce((sum, c) => sum + c.etudiantIds.length, 0);
         this.stats.update((s) =>
           s.map((stat, i) => {
             if (i === 0) return { ...stat, value: classes.length };
             if (i === 1) return { ...stat, value: totalEtudiants };
+            if (i === 2) return { ...stat, value: matieres.length };
+            if (i === 3) return { ...stat, value: users.length };
             return stat;
           }),
         );

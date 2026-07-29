@@ -1,21 +1,29 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { GraduationCap, Users, UserCheck } from "lucide-react";
+import { GraduationCap, Users, UserCheck, UserPlus } from "lucide-react";
+import toast from "react-hot-toast";
 import { useClasses } from "../../../application/classes/useClasses";
 import { useCreateClasse } from "../../../application/classes/useCreateClasse";
+import { useAssignerEnseignant } from "../../../application/classes/useAssignerEnseignant";
+import { useAssignerEtudiant } from "../../../application/classes/useAssignerEtudiant";
+import { useUsers } from "../../../application/users/useUsers";
 import {
   NIVEAUX,
   getAnneeActuelle,
   countEtudiants,
   countEnseignants,
 } from "../../../domain/classe";
+import type { Classe } from "../../../domain/classe";
+import { getNomComplet } from "../../../domain/user";
 import { Card } from "../../components/ui/Card";
 import { Input } from "../../components/ui/Input";
 import { Select } from "../../components/ui/Select";
 import { Button } from "../../components/ui/Button";
 import { Badge } from "../../components/ui/Badge";
 import { Spinner } from "../../components/ui/Spinner";
+import { Modal } from "../../components/ui/Modal";
 
 const classeSchema = z.object({
   nom: z.string().min(2, "Le nom doit contenir au moins 2 caractères"),
@@ -27,7 +35,20 @@ type ClasseFormValues = z.infer<typeof classeSchema>;
 
 export function ClassesPage() {
   const { data: classes, isLoading, error } = useClasses();
+  const { data: users } = useUsers();
   const { mutate: createClasse, isPending } = useCreateClasse();
+  const { mutate: assignerEnseignant, isPending: assignEnsPending } =
+    useAssignerEnseignant();
+  const { mutate: assignerEtudiant, isPending: assignEtuPending } =
+    useAssignerEtudiant();
+
+  const [classeAssignationId, setClasseAssignationId] = useState<number | null>(
+    null,
+  );
+  const classeAssignation =
+    classes?.find((c) => c.id === classeAssignationId) ?? null;
+  const [enseignantChoisi, setEnseignantChoisi] = useState("");
+  const [etudiantChoisi, setEtudiantChoisi] = useState("");
 
   const {
     register,
@@ -45,6 +66,55 @@ export function ClassesPage() {
         reset({ nom: "", niveau: "", annee: getAnneeActuelle() }),
     });
   }
+
+  function ouvrirAssignation(classe: Classe) {
+    setClasseAssignationId(classe.id);
+    setEnseignantChoisi("");
+    setEtudiantChoisi("");
+  }
+
+  function confirmerAssignerEnseignant() {
+    if (!classeAssignation || !enseignantChoisi) return;
+    assignerEnseignant(
+      {
+        classeId: classeAssignation.id,
+        enseignantId: Number(enseignantChoisi),
+      },
+      {
+        onSuccess: () => {
+          toast.success("Enseignant assigné à la classe");
+          setEnseignantChoisi("");
+        },
+        onError: () => toast.error("Impossible d'assigner cet enseignant"),
+      },
+    );
+  }
+
+  function confirmerAssignerEtudiant() {
+    if (!classeAssignation || !etudiantChoisi) return;
+    assignerEtudiant(
+      { classeId: classeAssignation.id, etudiantId: Number(etudiantChoisi) },
+      {
+        onSuccess: () => {
+          toast.success("Élève assigné à la classe");
+          setEtudiantChoisi("");
+        },
+        onError: () => toast.error("Impossible d'assigner cet élève"),
+      },
+    );
+  }
+
+  const enseignantsDisponibles = (users ?? []).filter(
+    (u) =>
+      u.roles.includes("ROLE_ENSEIGNANT") &&
+      !classeAssignation?.enseignantIds.includes(u.id),
+  );
+
+  const etudiantsDisponibles = (users ?? []).filter(
+    (u) =>
+      u.roles.includes("ROLE_ETUDIANT") &&
+      !classeAssignation?.etudiantIds.includes(u.id),
+  );
 
   return (
     <div className="space-y-6">
@@ -117,7 +187,7 @@ export function ClassesPage() {
                 </Badge>
               </div>
 
-              <div className="flex items-center gap-4 text-sm text-neutral-500">
+              <div className="flex items-center gap-4 text-sm text-neutral-500 mb-3">
                 <span className="flex items-center gap-1">
                   <Users size={14} />
                   {countEtudiants(classe)} étudiants
@@ -128,7 +198,16 @@ export function ClassesPage() {
                 </span>
               </div>
 
-              <Badge variant="primary">{classe.niveau}</Badge>
+              <div className="flex items-center justify-between">
+                <Badge variant="primary">{classe.niveau}</Badge>
+                <button
+                  onClick={() => ouvrirAssignation(classe)}
+                  className="flex items-center gap-1 text-xs text-primary-600 hover:text-primary-700 font-medium"
+                >
+                  <UserPlus size={14} />
+                  Assigner
+                </button>
+              </div>
             </Card>
           ))}
 
@@ -139,6 +218,90 @@ export function ClassesPage() {
           )}
         </div>
       )}
+
+      <Modal
+        open={!!classeAssignation}
+        onClose={() => setClasseAssignationId(null)}
+        title={"Assigner : " + (classeAssignation?.nom ?? "")}
+        size="md"
+      >
+        {classeAssignation && (
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-neutral-700">
+                Assigner un enseignant
+              </label>
+              <div className="flex gap-2">
+                <select
+                  value={enseignantChoisi}
+                  onChange={(e) => setEnseignantChoisi(e.target.value)}
+                  className="input-field flex-1"
+                >
+                  <option value="">Sélectionner un enseignant</option>
+                  {enseignantsDisponibles.map((u) => (
+                    <option key={u.id} value={u.id}>
+                      {getNomComplet(u)}
+                    </option>
+                  ))}
+                </select>
+                <Button
+                  onClick={confirmerAssignerEnseignant}
+                  disabled={!enseignantChoisi || assignEnsPending}
+                  isLoading={assignEnsPending}
+                >
+                  Assigner
+                </Button>
+              </div>
+              {enseignantsDisponibles.length === 0 && (
+                <p className="text-xs text-neutral-400">
+                  Tous les enseignants sont déjà assignés à cette classe.
+                </p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-neutral-700">
+                Assigner un élève
+              </label>
+              <div className="flex gap-2">
+                <select
+                  value={etudiantChoisi}
+                  onChange={(e) => setEtudiantChoisi(e.target.value)}
+                  className="input-field flex-1"
+                >
+                  <option value="">Sélectionner un élève</option>
+                  {etudiantsDisponibles.map((u) => (
+                    <option key={u.id} value={u.id}>
+                      {getNomComplet(u)}
+                    </option>
+                  ))}
+                </select>
+                <Button
+                  onClick={confirmerAssignerEtudiant}
+                  disabled={!etudiantChoisi || assignEtuPending}
+                  isLoading={assignEtuPending}
+                >
+                  Assigner
+                </Button>
+              </div>
+              {etudiantsDisponibles.length === 0 && (
+                <p className="text-xs text-neutral-400">
+                  Tous les élèves sont déjà assignés à cette classe.
+                </p>
+              )}
+            </div>
+
+            <div className="flex justify-end pt-3 border-t border-neutral-100">
+              <Button
+                variant="ghost"
+                onClick={() => setClasseAssignationId(null)}
+              >
+                Fermer
+              </Button>
+            </div>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }

@@ -75,4 +75,10 @@ public class ReleveService {
             throw new BusinessException("Erreur génération Excel : " + e.getMessage());
         }
     }
+
+    public ReleveResponse findById(Long id) {
+        return releveRepository.findById(id)
+                .map(ReleveResponse::from)
+                .orElseThrow(() -> new ResourceNotFoundException("Relevé introuvable : " + id));
+    }
 }

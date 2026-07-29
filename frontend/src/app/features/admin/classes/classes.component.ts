@@ -2,6 +2,7 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { IconComponent } from '../../../shared/components/icon/icon.component';
+import { ConfirmModalComponent } from '../../../shared/components/confirm-modal/confirm-modal.component';
 import { ClasseService } from '../../../core/services/classe.service';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../../../../environments/environment';
@@ -11,7 +12,7 @@ import { User } from '../../../core/models/user.model';
 @Component({
   selector: 'app-classes',
   standalone: true,
-  imports: [CommonModule, FormsModule, IconComponent],
+  imports: [CommonModule, FormsModule, IconComponent, ConfirmModalComponent],
   templateUrl: './classes.component.html',
 })
 export class ClassesComponent implements OnInit {
@@ -26,6 +27,11 @@ export class ClassesComponent implements OnInit {
   selectedClasse = signal<Classe | null>(null);
   selectedEnseignantId = 0;
   selectedEtudiantId = 0;
+
+  // Modal de confirmation de suppression
+  confirmModalOpen = signal(false);
+  classeIdToDelete = signal<number | null>(null);
+  deleting = signal(false);
 
   form: ClasseRequest = { nom: '', niveau: '', annee: '' };
   niveaux = ['L1', 'L2', 'L3', 'M1', 'M2', 'BTS1', 'BTS2', 'DUT1', 'DUT2'];
@@ -137,16 +143,35 @@ export class ClassesComponent implements OnInit {
       });
   }
 
-  delete(id: number) {
-    if (!confirm('Supprimer cette classe ?')) return;
+  // Ouvre le modal au lieu de confirm()
+  ouvrirConfirmDelete(id: number) {
+    this.classeIdToDelete.set(id);
+    this.confirmModalOpen.set(true);
+  }
+
+  fermerConfirmDelete() {
+    this.confirmModalOpen.set(false);
+    this.classeIdToDelete.set(null);
+  }
+
+  confirmerDelete() {
+    const id = this.classeIdToDelete();
+    if (!id) return;
+    this.deleting.set(true);
     this.classeService.delete(id).subscribe({
       next: () => {
+        this.deleting.set(false);
+        this.confirmModalOpen.set(false);
+        this.classeIdToDelete.set(null);
         this.successMsg.set('Classe supprimée');
         if (this.selectedClasse()?.id === id) this.selectedClasse.set(null);
         this.load();
         setTimeout(() => this.successMsg.set(''), 3000);
       },
-      error: (err) => this.errorMsg.set(err.error?.message || 'Erreur'),
+      error: (err) => {
+        this.deleting.set(false);
+        this.errorMsg.set(err.error?.message || 'Erreur');
+      },
     });
   }
 }

@@ -54,7 +54,7 @@
       <label class="label">Étudiant</label>
       <select [(ngModel)]="selectedEtudiantId" class="input" [disabled]="!selectedClasseId">
         <option [value]="0">Sélectionner un étudiant</option>
-        <option *ngFor="let id of getEtudiants()" [value]="id">Étudiant #{{ id }}</option>
+        <option *ngFor="let id of getEtudiants()" [value]="id">{{ getNomUser(id) }}</option>
       </select>
     </div>
 

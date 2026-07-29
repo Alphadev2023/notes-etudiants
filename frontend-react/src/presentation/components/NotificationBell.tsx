@@ -1,9 +1,10 @@
-import { useState } from "react";
+﻿import { useState, useRef, useEffect } from "react";
 import { Bell } from "lucide-react";
 import { useNotificationStore } from "../../application/notification/useNotificationStore";
 
 export function NotificationBell() {
   const [open, setOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
   const notifications = useNotificationStore((state) => state.notifications);
   const unreadCount = useNotificationStore((state) => state.unreadCount);
   const markAllRead = useNotificationStore((state) => state.markAllRead);
@@ -16,8 +17,29 @@ export function NotificationBell() {
     });
   }
 
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
+    }
+    function handleEscape(e: KeyboardEvent) {
+      if (e.key === "Escape") setOpen(false);
+    }
+
+    if (open) {
+      document.addEventListener("mousedown", handleClickOutside);
+      document.addEventListener("keydown", handleEscape);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [open]);
+
   return (
-    <div className="relative">
+    <div className="relative" ref={containerRef}>
       <button
         onClick={toggle}
         className="relative p-2 rounded-lg hover:bg-neutral-100 transition-colors"
@@ -29,7 +51,6 @@ export function NotificationBell() {
           </span>
         )}
       </button>
-
       {open && (
         <div className="absolute right-0 mt-2 w-72 bg-white rounded-lg shadow-lg border border-neutral-200 z-50 max-h-80 overflow-y-auto">
           <div className="px-4 py-3 border-b border-neutral-100">
@@ -37,7 +58,6 @@ export function NotificationBell() {
               Notifications
             </p>
           </div>
-
           {notifications.length === 0 ? (
             <p className="px-4 py-6 text-sm text-neutral-400 text-center">
               Aucune notification pour le moment.

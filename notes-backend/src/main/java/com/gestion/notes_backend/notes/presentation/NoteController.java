@@ -9,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -33,7 +34,10 @@ public class NoteController {
 
     @GetMapping("/etudiant/{etudiantId}")
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_ENSEIGNANT', 'ROLE_ETUDIANT')")
-    public ResponseEntity<List<NoteResponse>> findByEtudiant(@PathVariable Long etudiantId) {
+    public ResponseEntity<List<NoteResponse>> findByEtudiant(
+            @PathVariable Long etudiantId,
+            @AuthenticationPrincipal User user) {
+        verifierAcces(user, etudiantId);
         return ResponseEntity.ok(noteService.findByEtudiant(etudiantId));
     }
 
@@ -47,7 +51,9 @@ public class NoteController {
     @PreAuthorize("hasAnyAuthority('ROLE_ADMIN', 'ROLE_ENSEIGNANT', 'ROLE_ETUDIANT')")
     public ResponseEntity<MoyenneResponse> calculerMoyenne(
             @PathVariable Long etudiantId,
-            @PathVariable Long classeId) {
+            @PathVariable Long classeId,
+            @AuthenticationPrincipal User user) {
+        verifierAcces(user, etudiantId);
         return ResponseEntity.ok(noteService.calculerMoyenne(etudiantId, classeId));
     }
 
@@ -65,5 +71,14 @@ public class NoteController {
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         noteService.delete(id);
         return ResponseEntity.noContent().build();
+    }
+
+    // Un étudiant ne peut consulter que ses propres notes ; Admin/Enseignant ont accès à tout
+    private void verifierAcces(User user, Long etudiantIdDemande) {
+        boolean estEtudiantSeul = user.getRoles().stream()
+                .allMatch(r -> r.name().equals("ROLE_ETUDIANT"));
+        if (estEtudiantSeul && !user.getId().equals(etudiantIdDemande)) {
+            throw new AccessDeniedException("Accès refusé à ces notes");
+        }
     }
 }

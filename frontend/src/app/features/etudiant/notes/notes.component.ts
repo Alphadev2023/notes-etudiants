@@ -1,5 +1,7 @@
-import { Component, OnInit, signal } from '@angular/core';
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { forkJoin } from 'rxjs';
 import { IconComponent } from '../../../shared/components/icon/icon.component';
 import { NoteService } from '../../../core/services/note.service';
 import { MatiereService } from '../../../core/services/matiere.service';
@@ -12,7 +14,7 @@ import { Classe } from '../../../core/models/classe.model';
 @Component({
   selector: 'app-notes',
   standalone: true,
-  imports: [CommonModule, IconComponent],
+  imports: [CommonModule, FormsModule, IconComponent],
   templateUrl: './notes.component.html',
 })
 export class NotesComponent implements OnInit {
@@ -20,6 +22,18 @@ export class NotesComponent implements OnInit {
   matieres = signal<Matiere[]>([]);
   classes = signal<Classe[]>([]);
   loading = signal(true);
+
+  // Pagination
+  currentPage = signal(1);
+  pageSize = signal(10);
+  pageSizeOptions = [5, 10];
+
+  totalPages = computed(() => Math.max(1, Math.ceil(this.notes().length / this.pageSize())));
+
+  notesPage = computed(() => {
+    const start = (this.currentPage() - 1) * this.pageSize();
+    return this.notes().slice(start, start + this.pageSize());
+  });
 
   constructor(
     private noteService: NoteService,
@@ -43,11 +57,17 @@ export class NotesComponent implements OnInit {
     this.classeService.findByEtudiant(user.id).subscribe({
       next: (classes) => {
         this.classes.set(classes);
-        if (classes.length > 0) {
-          this.matiereService.findByClasse(classes[0].id).subscribe({
-            next: (matieres) => this.matieres.set(matieres),
-          });
-        }
+        if (classes.length === 0) return;
+
+        // Charge les matières de TOUTES les classes de l'étudiant, pas juste la première
+        forkJoin(classes.map((c) => this.matiereService.findByClasse(c.id))).subscribe({
+          next: (matieresParClasse) => {
+            const toutesMatieres = matieresParClasse.flat();
+            // Dédoublonnage par id, au cas où une matière apparaîtrait dans plusieurs classes
+            const uniques = Array.from(new Map(toutesMatieres.map((m) => [m.id, m])).values());
+            this.matieres.set(uniques);
+          },
+        });
       },
     });
   }
@@ -76,5 +96,18 @@ export class NotesComponent implements OnInit {
     if (valeur >= 10) return 'badge-primary';
     if (valeur >= 8) return 'badge-warning';
     return 'badge-danger';
+  }
+
+  onPageSizeChange() {
+    this.currentPage.set(1);
+  }
+
+  allerPage(page: number) {
+    if (page < 1 || page > this.totalPages()) return;
+    this.currentPage.set(page);
+  }
+
+  pagesArray(): number[] {
+    return Array.from({ length: this.totalPages() }, (_, i) => i + 1);
   }
 }

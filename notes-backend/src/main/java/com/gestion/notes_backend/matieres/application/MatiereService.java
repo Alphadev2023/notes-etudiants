@@ -41,6 +41,13 @@ public class MatiereService {
                 .toList();
     }
 
+    public List<MatiereResponse> findAll() {
+        return matiereRepository.findAll()
+                .stream()
+                .map(MatiereResponse::from)
+                .toList();
+    }
+
     public List<MatiereResponse> findByClasseAndSemestre(Long classeId, Integer semestre) {
         return matiereRepository.findByClasseIdAndSemestre(classeId, semestre)
                 .stream()
